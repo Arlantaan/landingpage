@@ -46,6 +46,9 @@ app.post("/api/form", async (req, res) => {
       return res.status(400).json({ error: "Invalid phone number format." });
     }
 
+    // Simulate processing delay (for loading spinner testing)
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     // Save form data to the database
     const newForm = new FormModel({ name, email, phone });
     await newForm.save();
@@ -57,6 +60,20 @@ app.post("/api/form", async (req, res) => {
     res.status(500).json({ error: "Error saving form data." });
   }
 });
+
+// Admin Dashboard: Fetch all form submissions
+app.get("/api/submissions", async (req, res) => {
+  try {
+    const submissions = await FormModel.find();
+    res.status(200).json(submissions);
+  } catch (error) {
+    console.error("Error fetching submissions:", error);
+    res.status(500).json({ error: "Error fetching submissions." });
+  }
+});
+
+// Serve static files (for the "thank you" page)
+app.use(express.static("public"));
 
 // Start Server on the specified port
 const PORT = process.env.PORT || 5000;
